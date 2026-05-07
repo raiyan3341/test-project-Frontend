@@ -36,7 +36,7 @@ const Navbar = () => {
         <nav className="bg-gray-900 border-b border-gray-800 px-6 py-4 flex justify-between items-center sticky top-0 z-50">
             {/* Logo */}
             <Link to="/" className="text-2xl font-black text-cyan-400 tracking-tighter italic">
-                AEGIS-QUEST
+                BIRIANI HOUSE
             </Link>
 
             {/* Nav Links */}
