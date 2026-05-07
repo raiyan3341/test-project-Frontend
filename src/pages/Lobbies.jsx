@@ -67,24 +67,24 @@ const Lobbies = () => {
     ];
 
    const fetchMasjids = async (lat, lng) => {
+    const query = `[out:json];node["amenity"="place_of_worship"]["religion"="muslim"](around:3000, ${lat}, ${lng});out;`;
+    
+    // Proxy URL add kora hoyeche
+    const proxyUrl = "https://api.allorigins.win/raw?url=";
+    const targetUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+    
     try {
-        // Apnar deployed backend URL ekhane boshaben
-        const backendBaseUrl = "https://test-project-backend-kohl.vercel.app";
+        const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
         
-        const response = await fetch(`${backendBaseUrl}/api/masjids?lat=${lat}&lng=${lng}`);
-        
-        if (!response.ok) throw new Error('Backend response error');
+        if (!response.ok) throw new Error('Network response was not ok');
         
         const data = await response.json();
-        
-        // Overpass API theke pawa elements-gulo ke marker list-e set kora
         const masjids = data.elements.map(m => ({
             id: m.id,
             lat: m.lat,
             lng: m.lon,
             name: m.tags.name || "Unknown Masjid"
         }));
-        
         setNearbyMasjids(masjids);
     } catch (error) {
         console.error("Map Data Error:", error);
