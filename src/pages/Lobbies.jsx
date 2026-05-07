@@ -66,25 +66,30 @@ const Lobbies = () => {
         "Bypassing Hunger Protocol..."
     ];
 
-    const fetchMasjids = async (lat, lng) => {
-        // Overpass API coordinate tracking with 2km radius
-        const query = `[out:json];node["amenity"="place_of_worship"]["religion"="muslim"](around:2000, ${lat}, ${lng});out;`;
-        const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+   const fetchMasjids = async (lat, lng) => {
+    try {
+        // Apnar deployed backend URL ekhane boshaben
+        const backendBaseUrl = "https://test-project-backend-kohl.vercel.app";
         
-        try {
-            const response = await fetch(url);
-            const data = await response.json();
-            const masjids = data.elements.map(m => ({
-                id: m.id,
-                lat: m.lat,
-                lng: m.lon,
-                name: m.tags.name || "Local Masjid"
-            }));
-            setNearbyMasjids(masjids);
-        } catch (error) {
-            console.error("Error fetching masjids:", error);
-        }
-    };
+        const response = await fetch(`${backendBaseUrl}/api/masjids?lat=${lat}&lng=${lng}`);
+        
+        if (!response.ok) throw new Error('Backend response error');
+        
+        const data = await response.json();
+        
+        // Overpass API theke pawa elements-gulo ke marker list-e set kora
+        const masjids = data.elements.map(m => ({
+            id: m.id,
+            lat: m.lat,
+            lng: m.lon,
+            name: m.tags.name || "Unknown Masjid"
+        }));
+        
+        setNearbyMasjids(masjids);
+    } catch (error) {
+        console.error("Map Data Error:", error);
+    }
+};
 
     const handleJoin = () => {
         navigator.geolocation.getCurrentPosition(
