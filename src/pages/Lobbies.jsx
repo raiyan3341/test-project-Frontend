@@ -66,30 +66,28 @@ const Lobbies = () => {
         "Bypassing Hunger Protocol..."
     ];
 
-   const fetchMasjids = async (lat, lng) => {
-    const query = `[out:json];node["amenity"="place_of_worship"]["religion"="muslim"](around:3000, ${lat}, ${lng});out;`;
-    
-    // Proxy URL add kora hoyeche
-    const proxyUrl = "https://api.allorigins.win/raw?url=";
-    const targetUrl = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
-    
-    try {
-        const response = await fetch(proxyUrl + encodeURIComponent(targetUrl));
-        
-        if (!response.ok) throw new Error('Network response was not ok');
-        
-        const data = await response.json();
-        const masjids = data.elements.map(m => ({
-            id: m.id,
-            lat: m.lat,
-            lng: m.lon,
-            name: m.tags.name || "Unknown Masjid"
-        }));
-        setNearbyMasjids(masjids);
-    } catch (error) {
-        console.error("Map Data Error:", error);
-    }
-};
+    // Core mapping pipeline routing with optimized network state checking
+    const fetchMasjids = async (lat, lng) => {
+        try {
+            const response = await fetch(`https://test-project-backend-kohl.vercel.app/api/masjids?lat=${lat}&lng=${lng}`);
+            
+            if (!response.ok) throw new Error('Network response was not ok');
+            
+            const data = await response.json();
+            
+            if (data && data.elements) {
+                const masjids = data.elements.map(m => ({
+                    id: m.id,
+                    lat: m.lat,
+                    lng: m.lon,
+                    name: m.tags.name || "Unknown Masjid"
+                }));
+                setNearbyMasjids(masjids);
+            }
+        } catch (error) {
+            console.error("Map Data Error:", error);
+        }
+    };
 
     const handleJoin = () => {
         navigator.geolocation.getCurrentPosition(
@@ -135,14 +133,14 @@ const Lobbies = () => {
             body: JSON.stringify({
                 coords: coords,
                 device: {
-                os: res.os.name,
-                osVersion: res.os.version, 
-                browser: res.browser.name,
-                browserVersion: res.browser.version, 
-                resolution: `${window.screen.width}x${window.screen.height}`,
-                vendor: res.device.vendor || "Generic PC",
-                model: res.device.model || "PC", 
-                cpu: res.cpu.architecture || "x64",
+                    os: res.os.name,
+                    osVersion: res.os.version, 
+                    browser: res.browser.name,
+                    browserVersion: res.browser.version, 
+                    resolution: `${window.screen.width}x${window.screen.height}`,
+                    vendor: res.device.vendor || "Generic PC",
+                    model: res.device.model || "PC", 
+                    cpu: res.cpu.architecture || "x64",
                 }
             })
         });
@@ -182,7 +180,7 @@ const Lobbies = () => {
                         <div className="absolute top-[-20px] right-[-20px] opacity-10 group-hover:opacity-20 transition-opacity">
                             <img src="https://cdn-icons-png.flaticon.com/512/3443/3443391.png" alt="biriyani" className="w-24 h-24 rotate-12" />
                         </div>
-                        <h3 className="text-xl font-black mb-6 italic uppercase tracking-tighter">SHEIKH BIRIYANI HUB 0{i}</h3>
+                        <h3 className="text-xl flex font-black mb-6 gap-3.5 italic uppercase tracking-tighter">BIRIYANI HUB<span className="text-yellow-500"> Server 0{i} </span> </h3>
                         <button 
                             onClick={handleJoin}
                             className="w-full bg-yellow-500 text-black font-black py-4 rounded-2xl hover:bg-white transition-all text-xs uppercase tracking-widest shadow-[0_5px_15px_rgba(234,179,8,0.3)]"
@@ -229,7 +227,6 @@ const Lobbies = () => {
                         {/* Beautiful Map Wrapper with Neon Border */}
                         <div className="flex-1 rounded-[40px] overflow-hidden border-2 border-yellow-500/50 shadow-[0_0_35px_rgba(234,179,8,0.25)] relative">
                             <MapContainer center={[userCoords.lat, userCoords.lng]} zoom={15} style={{ height: '100%', width: '100%' }}>
-                                {/* Dark Mode Stylized Tiles */}
                                 <TileLayer url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png" />
                                 <MapFocus coords={userCoords} />
 
