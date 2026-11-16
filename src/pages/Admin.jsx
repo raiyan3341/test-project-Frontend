@@ -41,7 +41,7 @@ const Admin = () => {
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    const ADMIN_EMAIL = "adminuser@gmail.com"; 
+    const ADMIN_EMAIL = "admin123@gmail.com"; 
 
     useEffect(() => {
         const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
